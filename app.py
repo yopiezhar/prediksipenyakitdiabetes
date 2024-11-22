@@ -21,16 +21,16 @@ with st.form("prediction_form"):
     col1, col2 = st.columns(2)
 
     with col1:
-        Pregnancies = st.text_input("Jumlah Kehamilan (Pregnancies):", value="0")
-        Glucose = st.text_input("Kadar Glukosa (Glucose):", value="0")
-        BloodPressure = st.text_input("Tekanan Darah (BloodPressure):", value="0")
-        SkinThickness = st.text_input("Ketebalan Kulit (SkinThickness):", value="0")
+        Pregnancies = st.text_input("Jumlah Kehamilan (Pregnancies):", value="-")
+        Glucose = st.text_input("Kadar Glukosa (Glucose):", value="-")
+        BloodPressure = st.text_input("Tekanan Darah (BloodPressure):", value="-")
+        SkinThickness = st.text_input("Ketebalan Kulit (SkinThickness):", value="-")
 
     with col2:
-        Insulin = st.text_input("Kadar Insulin (Insulin):", value="0")
-        BMI = st.text_input("BMI:", value="0")
-        DiabetesPedigreeFunction = st.text_input("Fungsi Silsilah Diabetes:", value="0")
-        Age = st.text_input("Usia (Age):", value="0")
+        Insulin = st.text_input("Kadar Insulin (Insulin):", value="-")
+        BMI = st.text_input("BMI:", value="-")
+        DiabetesPedigreeFunction = st.text_input("Fungsi Silsilah Diabetes:", value="-")
+        Age = st.text_input("Usia (Age):", value="-")
 
     # Submit button
     submit = st.form_submit_button("Predict")
@@ -38,27 +38,32 @@ with st.form("prediction_form"):
 # Prediction logic
 if submit:
     try:
-        # Convert inputs to float
-        input_data = pd.DataFrame({
-            'Pregnancies': [float(Pregnancies.replace(",", "."))],
-            'Glucose': [float(Glucose.replace(",", "."))],
-            'BloodPressure': [float(BloodPressure.replace(",", "."))],
-            'SkinThickness': [float(SkinThickness.replace(",", "."))],
-            'Insulin': [float(Insulin.replace(",", "."))],
-            'BMI': [float(BMI.replace(",", "."))],
-            'DiabetesPedigreeFunction': [float(DiabetesPedigreeFunction.replace(",", "."))],
-            'Age': [float(Age.replace(",", "."))]
-        })
-
-        # Make prediction
-        prediction = model.predict(input_data)
-
-        # Display result with style
-        st.subheader("🔍 Hasil Prediksi")
-        if prediction[0] == 1:
-            st.error("❌ Pasien berisiko terkena diabetes.")
+        # Check if any input is still "-"
+        inputs = [Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]
+        if "-" in inputs or "" in inputs:
+            st.warning("⚠️ Harap isi semua data dengan benar sebelum melanjutkan!")
         else:
-            st.success("✅ Pasien tidak berisiko terkena diabetes.")
+            # Convert inputs to float
+            input_data = pd.DataFrame({
+                'Pregnancies': [float(Pregnancies.replace(",", "."))],
+                'Glucose': [float(Glucose.replace(",", "."))],
+                'BloodPressure': [float(BloodPressure.replace(",", "."))],
+                'SkinThickness': [float(SkinThickness.replace(",", "."))],
+                'Insulin': [float(Insulin.replace(",", "."))],
+                'BMI': [float(BMI.replace(",", "."))],
+                'DiabetesPedigreeFunction': [float(DiabetesPedigreeFunction.replace(",", "."))],
+                'Age': [float(Age.replace(",", "."))]
+            })
+
+            # Make prediction
+            prediction = model.predict(input_data)
+
+            # Display result with style
+            st.subheader("🔍 Hasil Prediksi")
+            if prediction[0] == 1:
+                st.error("❌ Pasien berisiko terkena diabetes.")
+            else:
+                st.success("✅ Pasien tidak berisiko terkena diabetes.")
 
     except ValueError:
         st.error("⚠️ Harap masukkan nilai numerik yang valid (gunakan titik/koma untuk desimal).")
